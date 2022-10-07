@@ -43,7 +43,7 @@ afterEvaluate {
                 from components.release
                 groupId ='rms.mobile'
                 artifactId = 'mobile_google_pay'
-                version = '1.0.2'
+                version = '1.0.3'
             }
         }
     }
