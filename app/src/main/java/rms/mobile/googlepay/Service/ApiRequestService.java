@@ -1,4 +1,4 @@
-package rms.mobile.sdk.module.Service;
+package rms.mobile.googlepay.Service;
 
 import android.net.Uri;
 import android.os.Build;
@@ -20,8 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import rms.mobile.sdk.module.BuildConfig;
-import rms.mobile.sdk.module.Helper.ApplicationHelper;
+//import rms.mobile.sdk.module.BuildConfig;
+import rms.mobile.googlepay.Helper.ApplicationHelper;
 
 import java.util.Base64;
 
@@ -131,7 +131,7 @@ public class ApiRequestService {
             httpConnection.setRequestMethod("POST");
             httpConnection.setRequestProperty("Accept", "application/json");
             httpConnection.setRequestProperty("Cookies", "PHPSESSID=ad6081qpihsb9en1nr9nivbkl3");
-            httpConnection.setRequestProperty("SDK-Version", BuildConfig.VERSION_NAME);
+            httpConnection.setRequestProperty("SDK-Version", "4.0.0");
             httpConnection.setDoOutput(true);
             httpConnection.setDoInput(true);
 

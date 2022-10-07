@@ -8,7 +8,7 @@ import androidx.annotation.RequiresApi;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import rms.mobile.sdk.module.Service.ApiRequestService;
+import rms.mobile.googlepay.Service.ApiRequestService;
 
 public class RMSGooglePay {
 
