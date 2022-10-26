@@ -59,22 +59,22 @@ public class ApiRequestService {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Object GetPaymentRequest(String gPayToken, JSONObject rmsInfo) {
+    public Object GetPaymentRequest(JSONObject paymentInput, String paymentInfo ) {
         Log.d(TAG, "GetPaymentRequest invoked");
-        paymentDetail = rmsInfo;
+
                 try {
                     String endPoint = "";
                     String txnType = "SALS";
-                    String orderId = paymentDetail.getString("orderId");
-                    String amount = paymentDetail.getString("amount");
-                    String currency = paymentDetail.getString("currency");
-                    String billName = paymentDetail.getString("billName");
-                    String billEmail = paymentDetail.getString("billEmail");
-                    String billPhone = paymentDetail.getString("billPhone");
-                    String billDesc = paymentDetail.getString("billDesc");
-                    String merchantId = paymentDetail.getString("merchantId");
-                    String verificationKey = paymentDetail.getString("verificationKey");
-                    String environmentMode = paymentDetail.getString("environmentMode");
+                    String orderId = paymentInput.getString("orderId");
+                    String amount = paymentInput.getString("amount");
+                    String currency = paymentInput.getString("currency");
+                    String billName = paymentInput.getString("billName");
+                    String billEmail = paymentInput.getString("billEmail");
+                    String billPhone = paymentInput.getString("billPhone");
+                    String billDesc = paymentInput.getString("billDesc");
+                    String merchantId = paymentInput.getString("merchantId");
+                    String verificationKey = paymentInput.getString("verificationKey");
+                    String environmentMode = paymentInput.getString("environmentMode");
 
                     if (environmentMode == Environment.PRODUCTION) {
                         endPoint = Production.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
@@ -94,9 +94,9 @@ public class ApiRequestService {
                         verificationKey
                     );
 
-                    String BasicBase64format
+                    String GooglePayBase64
                             = Base64.getEncoder()
-                            .encodeToString(gPayToken.getBytes());
+                            .encodeToString(paymentInfo.getBytes());
 
                     Uri.Builder builder = new Uri.Builder()
                             .appendQueryParameter("MerchantID", merchantId)
@@ -110,7 +110,7 @@ public class ApiRequestService {
                             .appendQueryParameter("CustDesc", billDesc)
                             .appendQueryParameter("Signature", vCode)
                             .appendQueryParameter("mpsl_version", "2")
-                            .appendQueryParameter("GooglePay", BasicBase64format);
+                            .appendQueryParameter("GooglePay", GooglePayBase64);
 
                         return postRequest(uri, builder);
                 } catch (JSONException e) {
