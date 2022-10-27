@@ -43,10 +43,10 @@ public class ApiRequestService {
         static final String API_PAYMENT = "https://sandbox.merchant.razer.com/";
     }
 
-    static class Environment {
-        static final String PRODUCTION = "prod";
-        static final String DEVELOPMENT = "dev";
-    }
+//    static class Environment {
+//        static final String PRODUCTION = "prod";
+//        static final String DEVELOPMENT = "dev";
+//    }
 
     public ApiRequestService() {
     }
@@ -74,11 +74,11 @@ public class ApiRequestService {
                     String billDesc = paymentInput.getString("billDesc");
                     String merchantId = paymentInput.getString("merchantId");
                     String verificationKey = paymentInput.getString("verificationKey");
-                    String environmentMode = paymentInput.getString("environmentMode");
+                    String isSandbox = paymentInput.getString("isSandbox");
 
-                    if (environmentMode == Environment.PRODUCTION) {
+                    if (isSandbox == "false") {
                         endPoint = Production.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
-                    } else if (environmentMode == Environment.DEVELOPMENT) {
+                    } else if (isSandbox == "true") {
                         endPoint = Development.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
                     }
 
@@ -94,9 +94,8 @@ public class ApiRequestService {
                         verificationKey
                     );
 
-                    String GooglePayBase64
-                            = Base64.getEncoder()
-                            .encodeToString(paymentInfo.getBytes());
+                    String GooglePayBase64 = Base64.getEncoder()
+                                            .encodeToString(paymentInfo.getBytes());
 
                     Uri.Builder builder = new Uri.Builder()
                             .appendQueryParameter("MerchantID", merchantId)
