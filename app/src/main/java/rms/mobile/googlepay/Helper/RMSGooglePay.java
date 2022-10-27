@@ -13,16 +13,16 @@ import rms.mobile.googlepay.Service.ApiRequestService;
 
 public class RMSGooglePay {
 
-    final Pattern ORDERID = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern AMOUNT = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern CURRENCY = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern BILLNAME = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern BILLEMAIL = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern BILLPHONE = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern BILLDESC = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern MERCHANTID = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern VERFICATIONKEY = Pattern.compile("^[A-Za-z, ]++$");
-    final Pattern ENV = Pattern.compile("^[A-Za-z, ]++$");
+    final Pattern ORDERID = Pattern.compile("^[a-zA-Z0-9]*$");
+    final Pattern AMOUNT = Pattern.compile("^[0-9.]*$");
+    final Pattern CURRENCY = Pattern.compile("^[a-zA-Z]*$");
+    final Pattern BILLNAME = Pattern.compile("^[\\S\\s]+[\\S]*$");
+    final Pattern BILLEMAIL = Pattern.compile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$");
+    final Pattern BILLPHONE = Pattern.compile("^[0-9]*$");
+    final Pattern BILLDESC = Pattern.compile("^[\\S\\s]+[\\S]*$");
+    final Pattern MERCHANTID = Pattern.compile("^[\\S\\s]+[\\S]*$");
+    final Pattern VERFICATIONKEY = Pattern.compile("^[A-Za-z0-9]+$");
+    final Pattern ENV = Pattern.compile("^(?i)(true|false)$");
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
