@@ -40,37 +40,51 @@ public class RMSGooglePay {
             String billDesc = paymentInput.getString("billDesc");
             String merchantId = paymentInput.getString("merchantId");
             String verificationKey = paymentInput.getString("verificationKey");
-            String environmentMode = paymentInput.getString("environmentMode");
+            String isSandbox = paymentInput.getString("isSandbox");
 
+            JSONObject error = new JSONObject();
+            error.put("error", "400");
+            error.put("message", "Invalid Input");
+            
             if (!ORDERID.matcher(orderId).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
             else if (!AMOUNT.matcher(amount).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
             else if (!CURRENCY.matcher(currency).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
             else if (!BILLNAME.matcher(billName).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
             else if (!BILLEMAIL.matcher(billEmail).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
             else if (!BILLPHONE.matcher(billPhone).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
             else if (!BILLDESC.matcher(billDesc).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
             else if (!MERCHANTID.matcher(merchantId).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
             else if (!VERFICATIONKEY.matcher(verificationKey).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             }
-            else if (!ENV.matcher(environmentMode).matches()) {
-                throw new IllegalArgumentException("Invalid String");
+            else if (!ENV.matcher(isSandbox).matches()) {
+                //throw new IllegalArgumentException("Invalid String");
+                return error;
             } else {
                 ApiRequestService pay = new ApiRequestService();
                 return pay.GetPaymentRequest(paymentInput, paymentInfo);
