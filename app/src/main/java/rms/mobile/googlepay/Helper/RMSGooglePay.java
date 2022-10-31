@@ -1,5 +1,6 @@
 package rms.mobile.googlepay.Helper;
 
+import android.os.AsyncTask;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -24,23 +25,23 @@ public class RMSGooglePay {
     final Pattern VERFICATIONKEY = Pattern.compile("^[A-Za-z0-9]+$");
     final Pattern ENV = Pattern.compile("^(?i)(true|false)$");
 
-
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Object requestPayment(JSONObject paymentInput, String paymentInfo) {
+    public Object requestPayment(String paymentInput, String paymentInfo) {
 
         try {
 
             //INPUT VALIDATION
-            String orderId = paymentInput.getString("orderId");
-            String amount = paymentInput.getString("amount");
-            String currency = paymentInput.getString("currency");
-            String billName = paymentInput.getString("billName");
-            String billEmail = paymentInput.getString("billEmail");
-            String billPhone = paymentInput.getString("billPhone");
-            String billDesc = paymentInput.getString("billDesc");
-            String merchantId = paymentInput.getString("merchantId");
-            String verificationKey = paymentInput.getString("verificationKey");
-            String isSandbox = paymentInput.getString("isSandbox");
+            JSONObject paymentInputObj = new JSONObject(paymentInput);
+            String orderId = paymentInputObj.getString("orderId");
+            String amount = paymentInputObj.getString("amount");
+            String currency = paymentInputObj.getString("currency");
+            String billName = paymentInputObj.getString("billName");
+            String billEmail = paymentInputObj.getString("billEmail");
+            String billPhone = paymentInputObj.getString("billPhone");
+            String billDesc = paymentInputObj.getString("billDesc");
+            String merchantId = paymentInputObj.getString("merchantId");
+            String verificationKey = paymentInputObj.getString("verificationKey");
+            String isSandbox = paymentInputObj.getString("isSandbox");
 
             JSONObject error = new JSONObject();
             if (!ORDERID.matcher(orderId).matches()) {
@@ -104,7 +105,7 @@ public class RMSGooglePay {
                 return error;
             } else {
                 ApiRequestService pay = new ApiRequestService();
-                return pay.GetPaymentRequest(paymentInput, paymentInfo);
+                return pay.GetPaymentRequest(paymentInputObj, paymentInfo);
             }
 
         } catch (JSONException e) {
