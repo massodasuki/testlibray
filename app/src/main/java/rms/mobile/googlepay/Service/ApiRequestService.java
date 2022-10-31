@@ -75,12 +75,11 @@ public class ApiRequestService {
                     String merchantId = paymentInput.getString("merchantId");
                     String verificationKey = paymentInput.getString("verificationKey");
                     String isSandbox = paymentInput.getString("isSandbox");
-
-                    Log.e("isSandbox", isSandbox);
-                    if (isSandbox == "false") {
+                    
+                    if (isSandbox.equals("false")) {
                         Log.e("production", isSandbox);
                         endPoint = Production.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
-                    } else if (isSandbox == "true") {
+                    } else if (isSandbox.equals("true")) {
                         Log.e("sandbox", isSandbox);
                         endPoint = Development.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
                     }
