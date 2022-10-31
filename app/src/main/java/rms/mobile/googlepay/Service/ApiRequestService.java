@@ -158,12 +158,14 @@ public class ApiRequestService {
         BufferedReader bufferedReader;
         StringBuilder stringBuilder = new StringBuilder();
         Map<String, String> holder = new HashMap<>();
-        JSONObject mainObject = new JSONObject();
+        JSONObject response = new JSONObject();
         String output;
 
         try {
             Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
-            return mainObject;
+            response.put("statusCode", httpURLConnection.getResponseCode());
+            response.put("statusCode", httpURLConnection.getResponseMessage());
+            return response;
         } catch (Exception e) {
             e.printStackTrace();
             Log.d(TAG, String.format("response: %s", stringBuilder));
