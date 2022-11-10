@@ -61,66 +61,64 @@ public class ApiRequestService {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public Object GetPaymentRequest(JSONObject paymentInput, String paymentInfo ) {
         Log.d(TAG, "GetPaymentRequest invoked");
+        try {
+            String endPoint = "";
+            String txnType = "SALS";
+            String orderId = paymentInput.getString("orderId");
+            String amount = paymentInput.getString("amount");
+            String currency = paymentInput.getString("currency");
+            String billName = paymentInput.getString("billName");
+            String billEmail = paymentInput.getString("billEmail");
+            String billPhone = paymentInput.getString("billPhone");
+            String billDesc = paymentInput.getString("billDesc");
+            String merchantId = paymentInput.getString("merchantId");
+            String verificationKey = paymentInput.getString("verificationKey");
+            String isSandbox = paymentInput.getString("isSandbox");
 
-                try {
-                    String endPoint = "";
-                    String txnType = "SALS";
-                    String orderId = paymentInput.getString("orderId");
-                    String amount = paymentInput.getString("amount");
-                    String currency = paymentInput.getString("currency");
-                    String billName = paymentInput.getString("billName");
-                    String billEmail = paymentInput.getString("billEmail");
-                    String billPhone = paymentInput.getString("billPhone");
-                    String billDesc = paymentInput.getString("billDesc");
-                    String merchantId = paymentInput.getString("merchantId");
-                    String verificationKey = paymentInput.getString("verificationKey");
-                    String isSandbox = paymentInput.getString("isSandbox");
+            if (isSandbox.equals("false")) {
+                endPoint = Production.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
+            } else if (isSandbox.equals("true")) {
+                endPoint = Development.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
+            }
 
-                    if (isSandbox.equals("false")) {
-                        endPoint = Production.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
-                    } else if (isSandbox.equals("true")) {
-                        endPoint = Development.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
-                    }
+            Uri uri = Uri.parse(endPoint)
+                    .buildUpon()
+                    .build();
 
-                    Uri uri = Uri.parse(endPoint)
-                            .buildUpon()
-                            .build();
+            //"Signature": "<MD5(amount+merchantID+referenceNo+Vkey)>",
+            String vCode = ApplicationHelper.getInstance().GetVCode(
+                amount,
+                merchantId,
+                orderId,
+                verificationKey
+            );
 
-                    //"Signature": "<MD5(amount+merchantID+referenceNo+Vkey)>",
-                    String vCode = ApplicationHelper.getInstance().GetVCode(
-                        amount,
-                        merchantId,
-                        orderId,
-                        verificationKey
-                    );
+            String GooglePayBase64 = Base64.getEncoder()
+                                    .encodeToString(paymentInfo.getBytes());
 
-                    String GooglePayBase64 = Base64.getEncoder()
-                                            .encodeToString(paymentInfo.getBytes());
+            Uri.Builder builder = new Uri.Builder()
+                    .appendQueryParameter("MerchantID", merchantId)
+                    .appendQueryParameter("ReferenceNo", orderId)
+                    .appendQueryParameter("TxnType", txnType)
+                    .appendQueryParameter("TxnCurrency", currency)
+                    .appendQueryParameter("TxnAmount", amount)
+                    .appendQueryParameter("CustName", billName)
+                    .appendQueryParameter("CustEmail", billEmail)
+                    .appendQueryParameter("CustContact", billPhone)
+                    .appendQueryParameter("CustDesc", billDesc)
+                    .appendQueryParameter("Signature", vCode)
+                    .appendQueryParameter("mpsl_version", "2")
+                    .appendQueryParameter("GooglePay", GooglePayBase64);
 
-                    Uri.Builder builder = new Uri.Builder()
-                            .appendQueryParameter("MerchantID", merchantId)
-                            .appendQueryParameter("ReferenceNo", orderId)
-                            .appendQueryParameter("TxnType", txnType)
-                            .appendQueryParameter("TxnCurrency", currency)
-                            .appendQueryParameter("TxnAmount", amount)
-                            .appendQueryParameter("CustName", billName)
-                            .appendQueryParameter("CustEmail", billEmail)
-                            .appendQueryParameter("CustContact", billPhone)
-                            .appendQueryParameter("CustDesc", billDesc)
-                            .appendQueryParameter("Signature", vCode)
-                            .appendQueryParameter("mpsl_version", "2")
-                            .appendQueryParameter("GooglePay", GooglePayBase64);
-
-                        return postRequest(uri, builder);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                return postRequest(uri, builder);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     private JSONObject postRequest(final Uri uri, final Uri.Builder params) throws JSONException {
         HttpURLConnection httpConnection = null;
-
         try {
             Log.d(TAG, "postRequest invoked");
 
@@ -164,7 +162,7 @@ public class ApiRequestService {
         try {
             Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
             response.put("statusCode", httpURLConnection.getResponseCode());
-            response.put("statusCode", httpURLConnection.getResponseMessage());
+            response.put("responseMessage", httpURLConnection.getResponseMessage());
             return response;
         } catch (Exception e) {
             e.printStackTrace();
