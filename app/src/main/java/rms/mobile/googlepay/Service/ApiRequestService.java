@@ -163,11 +163,28 @@ public class ApiRequestService {
             Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
             response.put("statusCode", httpURLConnection.getResponseCode());
             response.put("responseMessage", httpURLConnection.getResponseMessage());
+            response.put("responseBody", getResponseBody(httpURLConnection));
             return response;
         } catch (Exception e) {
             e.printStackTrace();
             Log.d(TAG, String.format("response: %s", stringBuilder));
             return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
+        }
+    }
+
+    public static String getResponseBody(HttpURLConnection conn) {
+        BufferedReader br = null;
+        StringBuilder body = null;
+        String line = "";
+        try {
+            br = new BufferedReader(new InputStreamReader(
+                    conn.getInputStream()));
+            body = new StringBuilder();
+            while ((line = br.readLine()) != null)
+                body.append(line);
+            return body.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
