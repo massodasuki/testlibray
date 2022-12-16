@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -152,39 +153,116 @@ public class ApiRequestService {
         }
     }
 
+//    private JSONObject parse(HttpURLConnection httpURLConnection) throws JSONException {
+//        BufferedReader bufferedReader;
+//        StringBuilder stringBuilder = new StringBuilder();
+//        Map<String, String> holder = new HashMap<>();
+//        JSONObject response = new JSONObject();
+//        String output;
+//
+//        try {
+//            Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
+//            response.put("statusCode", httpURLConnection.getResponseCode());
+//            response.put("responseMessage", httpURLConnection.getResponseMessage());
+//            response.put("responseBody", getResponseBody(httpURLConnection));
+////            return response;
+//            return new JSONObject(String.format("{\"response\":\"%s\"}", response));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            Log.d(TAG, String.format("response: %s", stringBuilder));
+//            return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
+//        }
+//    }
+//
+//    public static String getResponseBody(HttpURLConnection conn) {
+//        BufferedReader br = null;
+//        StringBuilder body = null;
+//        String line = "";
+//        try {
+//            br = new BufferedReader(new InputStreamReader(
+//                    conn.getInputStream()));
+//            body = new StringBuilder();
+//            while ((line = br.readLine()) != null)
+//                body.append(line);
+//            return body.toString();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
     private JSONObject parse(HttpURLConnection httpURLConnection) throws JSONException {
         BufferedReader bufferedReader;
         StringBuilder stringBuilder = new StringBuilder();
         Map<String, String> holder = new HashMap<>();
-        JSONObject response = new JSONObject();
-        String output;
+        JSONObject mainObject = new JSONObject();
+        String output = null;
 
         try {
             Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
-            response.put("statusCode", httpURLConnection.getResponseCode());
-            response.put("responseMessage", httpURLConnection.getResponseMessage());
-            response.put("responseBody", getResponseBody(httpURLConnection));
-            return response;
+            bufferedReader = new BufferedReader(new InputStreamReader((httpURLConnection.getErrorStream())));
+            while (true) {
+                try {
+                    if (!((output = bufferedReader.readLine()) != null)) break;
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                stringBuilder.append(output).append("\n");
+            }
+            try {
+                bufferedReader.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            httpURLConnection.disconnect();
+            Log.d(TAG, String.format("response: %s", stringBuilder));
+            return mainObject;
+//            switch (httpURLConnection.getResponseCode()) {
+//                case 200:
+//                case 201: {
+//                    switch (_msgType) {
+//                        case MsgType.GET_CHANNEL_STATUS:
+//                        case MsgType.GET_CHANNEL:
+//                        case MsgType.GET_BANK:
+//                        case MsgType.GET_CARD_TOKEN:
+//                        case MsgType.DELETE_CARD_TOKEN:
+//                        case MsgType.REDIRECT:
+//                            bufferedReader = new BufferedReader(new InputStreamReader((httpURLConnection.getInputStream())));
+//                            while ((output = bufferedReader.readLine()) != null) {
+//                                stringBuilder.append(output).append("\n");
+//                            }
+//                            bufferedReader.close();
+//                            httpURLConnection.disconnect();
+//                            mainObject = new JSONObject(stringBuilder.toString());
+//                            Log.d(TAG, String.format("response: %s", mainObject));
+//                            break;
+//                        case MsgType.GET_RESULT:
+//                            bufferedReader = new BufferedReader(new InputStreamReader((httpURLConnection.getInputStream())));
+//                            while ((output = bufferedReader.readLine()) != null) {
+//                                String[] keyValuePair = output.split(":");
+//                                holder.putIfAbsent(keyValuePair[0].trim(), keyValuePair[1].trim());
+//                            }
+//                            bufferedReader.close();
+//                            httpURLConnection.disconnect();
+//                            mainObject = new JSONObject(holder);
+//                            Log.d(TAG, String.format("response: %s", mainObject));
+//                        default:
+//                    }
+//                    return mainObject;
+//                }
+//                default:
+//                    bufferedReader = new BufferedReader(new InputStreamReader((httpURLConnection.getErrorStream())));
+//                    while ((output = bufferedReader.readLine()) != null) {
+//                        stringBuilder.append(output).append("\n");
+//                    }
+//                    bufferedReader.close();
+//                    httpURLConnection.disconnect();
+//                    Log.d(TAG, String.format("response: %s", stringBuilder));
+//                    return mainObject;
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             Log.d(TAG, String.format("response: %s", stringBuilder));
             return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
-        }
-    }
-
-    public static String getResponseBody(HttpURLConnection conn) {
-        BufferedReader br = null;
-        StringBuilder body = null;
-        String line = "";
-        try {
-            br = new BufferedReader(new InputStreamReader(
-                    conn.getInputStream()));
-            body = new StringBuilder();
-            while ((line = br.readLine()) != null)
-                body.append(line);
-            return body.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }
