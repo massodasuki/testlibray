@@ -82,6 +82,8 @@ public class ApiRequestService {
                 endPoint = Development.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
             }
 
+            endPoint = "https://dummyjson.com/posts";
+
             Uri uri = Uri.parse(endPoint)
                     .buildUpon()
                     .build();
