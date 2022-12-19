@@ -82,7 +82,7 @@ public class ApiRequestService {
                 endPoint = Development.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
             }
 
-            endPoint = "https://dummy.restapiexample.com/api/v1/create";
+//            endPoint = "https://dummy.restapiexample.com/api/v1/create";
 
             Uri uri = Uri.parse(endPoint)
                     .buildUpon()
@@ -158,18 +158,16 @@ public class ApiRequestService {
     private JSONObject parse(HttpURLConnection httpURLConnection) throws JSONException {
         BufferedReader bufferedReader;
         StringBuilder stringBuilder = new StringBuilder();
-        Map<String, String> holder = new HashMap<>();
+//        Map<String, String> holder = new HashMap<>();
         JSONObject response = new JSONObject();
-        String output;
+//        String output;
 
         try {
-            Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
             response.put("statusCode", httpURLConnection.getResponseCode());
             response.put("responseMessage", httpURLConnection.getResponseMessage());
             response.put("responseBody", getResponseBody(httpURLConnection));
-//            return response;
+            Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
             Log.d(TAG, String.format("responseBody: %s", getResponseBody(httpURLConnection)));
-//            return new JSONObject(String.format("{\"response\":\"%s\"}", response));
             return response;
         } catch (Exception e) {
             e.printStackTrace();
