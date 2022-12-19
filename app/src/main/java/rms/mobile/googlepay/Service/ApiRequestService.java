@@ -77,9 +77,9 @@ public class ApiRequestService {
             String isSandbox = paymentInput.getString("isSandbox");
 
             if (isSandbox.equals("false")) {
-                endPoint = Production.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
+                endPoint = Production.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
             } else if (isSandbox.equals("true")) {
-                endPoint = Development.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
+                endPoint = Development.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
             }
 
 //            endPoint = "https://dummy.restapiexample.com/api/v1/create";
