@@ -168,6 +168,7 @@ public class ApiRequestService {
             response.put("responseMessage", httpURLConnection.getResponseMessage());
             response.put("responseBody", getResponseBody(httpURLConnection));
 //            return response;
+            Log.d(TAG, String.format("responseBody: %s", getResponseBody(httpURLConnection)));
             return new JSONObject(String.format("{\"response\":\"%s\"}", response));
         } catch (Exception e) {
             e.printStackTrace();
