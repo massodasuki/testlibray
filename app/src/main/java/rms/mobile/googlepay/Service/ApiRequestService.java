@@ -155,69 +155,69 @@ public class ApiRequestService {
         }
     }
 
-//    private JSONObject parse(HttpURLConnection httpURLConnection) throws JSONException {
-//        BufferedReader bufferedReader;
-//        StringBuilder stringBuilder = new StringBuilder();
-//        Map<String, String> holder = new HashMap<>();
-//        JSONObject response = new JSONObject();
-//        String output;
-//
-//        try {
-//            Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
-//            response.put("statusCode", httpURLConnection.getResponseCode());
-//            response.put("responseMessage", httpURLConnection.getResponseMessage());
-//            response.put("responseBody", getResponseBody(httpURLConnection));
-////            return response;
-//            return new JSONObject(String.format("{\"response\":\"%s\"}", response));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Log.d(TAG, String.format("response: %s", stringBuilder));
-//            return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
-//        }
-//    }
-//
-//    public static String getResponseBody(HttpURLConnection conn) {
-//        BufferedReader br = null;
-//        StringBuilder body = null;
-//        String line = "";
-//        try {
-//            br = new BufferedReader(new InputStreamReader(
-//                    conn.getInputStream()));
-//            body = new StringBuilder();
-//            while ((line = br.readLine()) != null)
-//                body.append(line);
-//            return body.toString();
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     private JSONObject parse(HttpURLConnection httpURLConnection) throws JSONException {
         BufferedReader bufferedReader;
         StringBuilder stringBuilder = new StringBuilder();
         Map<String, String> holder = new HashMap<>();
-        JSONObject mainObject = new JSONObject();
-        String output = null;
+        JSONObject response = new JSONObject();
+        String output;
 
         try {
             Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
-            bufferedReader = new BufferedReader(new InputStreamReader((httpURLConnection.getErrorStream())));
-            while (true) {
-                try {
-                    if (!((output = bufferedReader.readLine()) != null)) break;
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-                stringBuilder.append(output).append("\n");
-            }
-            try {
-                bufferedReader.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            httpURLConnection.disconnect();
+            response.put("statusCode", httpURLConnection.getResponseCode());
+            response.put("responseMessage", httpURLConnection.getResponseMessage());
+            response.put("responseBody", getResponseBody(httpURLConnection));
+//            return response;
+            return new JSONObject(String.format("{\"response\":\"%s\"}", response));
+        } catch (Exception e) {
+            e.printStackTrace();
             Log.d(TAG, String.format("response: %s", stringBuilder));
-            return mainObject;
+            return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
+        }
+    }
+
+    public static String getResponseBody(HttpURLConnection conn) {
+        BufferedReader br = null;
+        StringBuilder body = null;
+        String line = "";
+        try {
+            br = new BufferedReader(new InputStreamReader(
+                    conn.getInputStream()));
+            body = new StringBuilder();
+            while ((line = br.readLine()) != null)
+                body.append(line);
+            return body.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+//    private JSONObject parse(HttpURLConnection httpURLConnection) throws JSONException {
+//        BufferedReader bufferedReader;
+//        StringBuilder stringBuilder = new StringBuilder();
+//        Map<String, String> holder = new HashMap<>();
+//        JSONObject mainObject = new JSONObject();
+//        String output = null;
+//
+//        try {
+//            Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
+//            bufferedReader = new BufferedReader(new InputStreamReader((httpURLConnection.getErrorStream())));
+//            while (true) {
+//                try {
+//                    if (!((output = bufferedReader.readLine()) != null)) break;
+//                } catch (IOException ex) {
+//                    ex.printStackTrace();
+//                }
+//                stringBuilder.append(output).append("\n");
+//            }
+//            try {
+//                bufferedReader.close();
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            }
+//            httpURLConnection.disconnect();
+//            Log.d(TAG, String.format("response: %s", stringBuilder));
+//            return mainObject;
 //            switch (httpURLConnection.getResponseCode()) {
 //                case 200:
 //                case 201: {
@@ -261,10 +261,10 @@ public class ApiRequestService {
 //                    Log.d(TAG, String.format("response: %s", stringBuilder));
 //                    return mainObject;
 //            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(TAG, String.format("response: %s", stringBuilder));
-            return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
-        }
-    }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            Log.d(TAG, String.format("response: %s", stringBuilder));
+//            return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
+//        }
+//    }
 }
