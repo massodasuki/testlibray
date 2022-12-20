@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,9 +26,9 @@ public class MainActivity extends AppCompatActivity {
     void processValue(String myValue) {
         //handle value
         //Update GUI, show toast, etc..
-        Toast.makeText(
-                this, getString(R.string.payments_show_name, myValue),
-                Toast.LENGTH_LONG).show();
+//        Toast.makeText(
+//                this, getString(R.string.payments_show_name, myValue),
+//                Toast.LENGTH_LONG).show();
 
         WebView webview = new WebView(this);
         setContentView(webview);
@@ -48,10 +49,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent intent = getIntent();
-        String paymentInput = intent.getStringExtra("paymentInput");
-        String paymentInfo = intent.getStringExtra("paymentInfo");
-        Log.d(TAG, String.format("paymentInput: %s - paymentInfo - %s", paymentInput, paymentInfo));
+//        Intent intent = getIntent();
+//        String paymentInput = intent.getStringExtra("paymentInput");
+//        String paymentInfo = intent.getStringExtra("paymentInfo");
+//        Log.d(TAG, String.format("paymentInput: %s - paymentInfo - %s", paymentInput, paymentInfo));
 
 //        JSONObject paymentInputObj = new JSONObject();
 //
@@ -108,11 +109,25 @@ public class MainActivity extends AppCompatActivity {
         //     }
         // }
 
-        PaymentTaskRunner runner = new PaymentTaskRunner();
-        runner.execute(paymentInput, paymentInfo);
+//        PaymentTaskRunner runner = new PaymentTaskRunner();
+//        runner.execute(paymentInput, paymentInfo);
 
     }
 
+    @Override
+    protected void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+
+        Intent intent = getIntent();
+        String paymentInput = intent.getStringExtra("paymentInput");
+        String paymentInfo = intent.getStringExtra("paymentInfo");
+        Log.d(TAG, String.format("paymentInput: %s - paymentInfo - %s", paymentInput, paymentInfo));
+        new PaymentTaskRunner().execute(paymentInput, paymentInfo);
+
+    }
+
+    @SuppressLint("StaticFieldLeak")
     private class PaymentTaskRunner extends AsyncTask<String, String, String> {
 
         private String resp;
