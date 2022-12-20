@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("StaticFieldLeak")
     private class PaymentTaskRunner extends AsyncTask<String, String, String> {
 
-        private String resp;
+        public String resp;
         @Override
         protected String doInBackground(String... params) {
             runOnUiThread(new Runnable() {
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Log.i("PaymentTaskRunner onPostExecute", result);
-            processValue(result);
+            processValue(resp);
         }
         @Override
         protected void onPreExecute() {
