@@ -66,7 +66,7 @@ public class WebActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params) {
             try {
-//                Looper.prepare();
+                Looper.prepare();
                 RMSGooglePay pay = new RMSGooglePay();
                 JSONObject result = (JSONObject) pay.requestPayment(
                         params[0],
@@ -74,7 +74,7 @@ public class WebActivity extends AppCompatActivity {
                 );
                 Log.i("What is in here", "String.valueOf(result)");
                 resp = result.toString();
-//                Looper.loop();
+                Looper.loop();
             } catch (Exception e) {
                 e.printStackTrace();
                 resp = e.getMessage();
