@@ -133,28 +133,34 @@ public class MainActivity extends AppCompatActivity {
         private String resp;
         @Override
         protected String doInBackground(String... params) {
-            try {
-                RMSGooglePay pay = new RMSGooglePay();
-                JSONObject result = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    result = (JSONObject) pay.requestPayment(
-                            params[0],
-                            params[1]
-                    );
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // WORK on UI thread here
+                    try {
+                        RMSGooglePay pay = new RMSGooglePay();
+                        JSONObject result = null;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            result = (JSONObject) pay.requestPayment(
+                                    params[0],
+                                    params[1]
+                            );
+                        }
+                        Log.i("What is in here", String.valueOf(result));
+                        resp = result.toString();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        resp = e.getMessage();
+                    }
                 }
-                Log.i("What is in here", String.valueOf(result));
-                resp = result.toString();
-            } catch (Exception e) {
-                e.printStackTrace();
-                resp = e.getMessage();
-            }
+            });
             Log.i("PaymentTaskRunner doInBackground", resp);
             return resp;
         }
         @Override
         protected void onPostExecute(String result) {
             Log.i("PaymentTaskRunner onPostExecute", result);
-//            processValue(result);
+            processValue(result);
         }
         @Override
         protected void onPreExecute() {
