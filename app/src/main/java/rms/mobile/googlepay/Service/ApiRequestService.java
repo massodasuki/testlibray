@@ -76,9 +76,9 @@ public class ApiRequestService {
             String isSandbox = paymentInput.getString("isSandbox");
 
             if (isSandbox.equals("false")) {
-                endPoint = Production.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
+                endPoint = Production.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
             } else if (isSandbox.equals("true")) {
-                endPoint = Development.API_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
+                endPoint = Development.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
             }
 
             Uri uri = Uri.parse(endPoint)
@@ -160,10 +160,11 @@ public class ApiRequestService {
         String output;
 
         try {
-            Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
+//            Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
             response.put("statusCode", httpURLConnection.getResponseCode());
             response.put("responseMessage", httpURLConnection.getResponseMessage());
             response.put("responseBody", getResponseBody(httpURLConnection));
+            Log.d(TAG, String.format("code: %s - %s body - %s", response.getString("statusCode"),response.getString("responseMessage"), response.getString("responseBody")));
             return response;
         } catch (Exception e) {
             e.printStackTrace();
