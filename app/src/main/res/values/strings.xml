@@ -3,7 +3,6 @@
     <string name="payments_show_name" translatable="false">Successfully received payment data for
         %s!
     </string>
-    <string name="title_activity_web">WebActivity</string>
     <!-- Strings used for fragments for navigation -->
 
 </resources>
