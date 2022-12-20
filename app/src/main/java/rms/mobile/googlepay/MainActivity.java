@@ -153,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
         }
         @Override
         protected void onPostExecute(String result) {
-            Log.i("PaymentTaskRunner onPostExecute", "Done");
-            processValue(result);
+            Log.i("PaymentTaskRunner onPostExecute", result);
+//            processValue(result);
         }
         @Override
         protected void onPreExecute() {
