@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
-import android.webkit.WebView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,22 +13,15 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 //import rms.mobile.sdk.module.BuildConfig;
 import rms.mobile.googlepay.Helper.ApplicationHelper;
-import rms.mobile.googlepay.MainActivity;
 
 import java.util.Base64;
 
@@ -174,10 +166,6 @@ public class ApiRequestService extends AppCompatActivity {
             response.put("responseMessage", httpURLConnection.getResponseMessage());
             response.put("responseBody", getResponseBody(httpURLConnection));
             Log.d(TAG, String.format("code: %s - %s body - %s", response.getString("statusCode"),response.getString("responseMessage"), response.getString("responseBody")));
-
-            Intent i = new Intent(this,MainActivity.class);
-            startActivity(i);
-
             return response;
         } catch (Exception e) {
             e.printStackTrace();
