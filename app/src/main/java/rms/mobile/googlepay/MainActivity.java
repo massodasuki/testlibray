@@ -123,7 +123,12 @@ public class MainActivity extends AppCompatActivity {
         String paymentInput = intent.getStringExtra("paymentInput");
         String paymentInfo = intent.getStringExtra("paymentInfo");
         Log.d(TAG, String.format("paymentInput: %s - paymentInfo - %s", paymentInput, paymentInfo));
-        new PaymentTaskRunner().execute(paymentInput, paymentInfo);
+
+        //Body of your click handler
+        Thread thread = new Thread(() -> {
+            new PaymentTaskRunner().execute(paymentInput, paymentInfo);
+        });
+        thread.start();
 
     }
 
