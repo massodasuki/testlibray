@@ -22,6 +22,7 @@ import java.util.Map;
 
 //import rms.mobile.sdk.module.BuildConfig;
 import rms.mobile.googlepay.Helper.ApplicationHelper;
+import rms.mobile.googlepay.model.Transaction;
 
 import java.util.Base64;
 
@@ -30,6 +31,8 @@ public class ApiRequestService {
     public static JSONObject paymentDetail;
     private static final String TAG = "ApiServiceRequest";
     private static ApiRequestService single_instance = null;
+
+    public Transaction transaction = new Transaction();
 
     private String _msgType;
 
@@ -75,6 +78,19 @@ public class ApiRequestService {
             String verificationKey = paymentInput.getString("verificationKey");
             String isSandbox = paymentInput.getString("isSandbox");
 
+            //Set transaction model for query after success/fail
+            transaction.setTxID(orderId);
+            transaction.setDomain(merchantId);
+            transaction.setVkey(verificationKey);
+            transaction.setAmount(amount);
+
+//            transaction.setSkey();
+//
+//            AppData.getInstance().getTxnID(),
+//                    mMobileSDKParam.getMerchantId(),
+//                    mMobileSDKParam.getVerificationKey(),
+//                    mMobileSDKParam.getAmount()
+
             if (isSandbox.equals("false")) {
                 endPoint = Production.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
             } else if (isSandbox.equals("true")) {
@@ -116,6 +132,52 @@ public class ApiRequestService {
         }
         return null;
     }
+
+    public Object GetPaymentResult(JSONObject paymentInput ) {
+        Log.d(TAG, "GetPaymentRequest invoked");
+        try {
+            String endPoint = "";
+            String isSandbox = "false";
+
+            if (isSandbox.equals("false")) {
+                endPoint = Production.BASE_PAYMENT + "RMS/q_by_tid.php";
+            } else if (isSandbox.equals("true")) {
+                endPoint = Development.BASE_PAYMENT + "RMS/q_by_tid.php";
+            }
+
+            Uri uri = Uri.parse(endPoint)
+                    .buildUpon()
+                    .build();
+
+            String sKey = ApplicationHelper.getInstance().GetSKey(
+                    transaction.getTxID(),
+                    transaction.getDomain(),
+                    transaction.getVkey(),
+                    transaction.getAmount()
+            );
+
+//            String sKey = ApplicationHelper.getInstance().GetSKey(
+//                    AppData.getInstance().getTxnID(),
+//                    mMobileSDKParam.getMerchantId(),
+//                    mMobileSDKParam.getVerificationKey(),
+//                    mMobileSDKParam.getAmount()
+//            );
+
+            Uri.Builder builder = new Uri.Builder()
+                    .appendQueryParameter("amount", transaction.getAmount())
+                    .appendQueryParameter("txID", transaction.getTxID())
+                    .appendQueryParameter("domain", transaction.getDomain())
+                    .appendQueryParameter("skey", sKey)
+                    .appendQueryParameter("url", "")
+                    .appendQueryParameter("type", "0");
+
+            return postRequest(uri, builder);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     private JSONObject postRequest(final Uri uri, final Uri.Builder params) throws JSONException {
         HttpURLConnection httpConnection = null;
