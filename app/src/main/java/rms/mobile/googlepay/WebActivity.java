@@ -30,6 +30,7 @@ public class WebActivity extends AppCompatActivity {
 
     private WebView wvGateway;
     private CountDownTimer countDownTimer;
+    public String isSandbox = "false";
 
     public Transaction transaction = new Transaction();
     private String _transaction;
@@ -44,9 +45,7 @@ public class WebActivity extends AppCompatActivity {
         String paymentInfo = intent.getStringExtra("paymentInfo");
         Log.d(TAG, String.format("paymentInput: %s - paymentInfo - %s", paymentInput, paymentInfo));
 
-
         // Transcation model from paymentInput
-
         JSONObject paymentInputObj = null;
         try {
             paymentInputObj = new JSONObject(paymentInput);
@@ -54,6 +53,8 @@ public class WebActivity extends AppCompatActivity {
 //            transaction.setDomain(paymentInputObj.getString("merchantId"));
             transaction.setVkey(paymentInputObj.getString("verificationKey"));
 //            transaction.setAmount(paymentInputObj.getString("amount"));
+
+            paymentInputObj.getString("isSandbox");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -122,6 +123,16 @@ public class WebActivity extends AppCompatActivity {
 
     public void onRequestData(JSONObject response) {
         Log.d(TAG, "onGetPaymentRequestForm onComplete invoked");
+
+        // DELETE LATER
+        if (isSandbox == "true") { // TEST_ENVIRONMENT
+            //RESULT FOR SANDBOX ENVIRONMENT
+            try {
+                response = new JSONObject("{\"MerchantID\":\"rmsxdk_mobile_Dev\",\"ReferenceNo\":\"dcbd3599c6981557197125028a46555\",\"TxnID\":\"87430775\",\"TxnType\":\"SALS\",\"TxnCurrency\":\"MYR\",\"TxnAmount\":\"1.00\",\"TxnChannel\":\"null\",\"TxnData\":{\"RequestURL\":\"https://www.onlinepayment.com.my/RMS/CardScheme/loading.php\",\"RequestMethod\":\"POST\",\"RequestType\":\"REDIRECT\",\"RequestData\":{\"q\":\"4490AE695DCF419BC66F52392A902580740255FCA5550F4083F84AE4FB1212765D182EDBC4F49800867419BDA082C56767F7CE5AD42B7243CC0EB2D531CC98D9468E49B723F065B8EE88915FA6E94191CE608F8D1588C90E7DDE2A640B8A63C181826618BACF05714CFAFE3A67ADBF3D735559275E86EC8BDCF27BB6F0CF4BA38634FCA47118DA927D66FA4518A3C41E6913444C26EDF776F3B500D8DEFA7D3DF8D2149E4A58E6FDCE5469FE02814E04D3CE46C23DC0D210026F1728F530D1CB0B7DADE9A5A23F7D802ECEDE5BE39A0AD2C2C985AC0CEC4A54544E03C72FF0AA23BA7D3A4426AB19241B37C2935AFF5E83AF074A311F573FF40A49D32B7458E7\"}}}");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
         try {
             if (response.has("error_code") && response.has("error_desc")) {
