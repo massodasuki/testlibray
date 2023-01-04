@@ -22,7 +22,6 @@ import java.util.Map;
 
 //import rms.mobile.sdk.module.BuildConfig;
 import rms.mobile.googlepay.Helper.ApplicationHelper;
-import rms.mobile.googlepay.model.Transaction;
 
 import java.util.Base64;
 
@@ -31,8 +30,6 @@ public class ApiRequestService {
     public static JSONObject paymentDetail;
     private static final String TAG = "ApiServiceRequest";
     private static ApiRequestService single_instance = null;
-
-    public Transaction transaction = new Transaction();
 
     private String _msgType;
 
@@ -78,19 +75,6 @@ public class ApiRequestService {
             String verificationKey = paymentInput.getString("verificationKey");
             String isSandbox = paymentInput.getString("isSandbox");
 
-            //Set transaction model for query after success/fail
-            transaction.setTxID(orderId);
-            transaction.setDomain(merchantId);
-            transaction.setVkey(verificationKey);
-            transaction.setAmount(amount);
-
-//            transaction.setSkey();
-//
-//            AppData.getInstance().getTxnID(),
-//                    mMobileSDKParam.getMerchantId(),
-//                    mMobileSDKParam.getVerificationKey(),
-//                    mMobileSDKParam.getAmount()
-
             if (isSandbox.equals("false")) {
                 endPoint = Production.BASE_PAYMENT + "RMS/API/Direct/1.4.0/index.php";
             } else if (isSandbox.equals("true")) {
@@ -133,7 +117,7 @@ public class ApiRequestService {
         return null;
     }
 
-    public Object GetPaymentResult(JSONObject paymentInput ) {
+    public Object GetPaymentResult(JSONObject transaction ) {
         Log.d(TAG, "GetPaymentRequest invoked");
         try {
             String endPoint = "";
@@ -149,11 +133,16 @@ public class ApiRequestService {
                     .buildUpon()
                     .build();
 
+            String txID = transaction.getString("txID");
+            String amount = transaction.getString("amount");
+            String merchantId = transaction.getString("merchantId");
+            String verificationKey = transaction.getString("verificationKey");
+
             String sKey = ApplicationHelper.getInstance().GetSKey(
-                    transaction.getTxID(),
-                    transaction.getDomain(),
-                    transaction.getVkey(),
-                    transaction.getAmount()
+                    txID,
+                    merchantId,
+                    verificationKey,
+                    amount
             );
 
 //            String sKey = ApplicationHelper.getInstance().GetSKey(
@@ -164,9 +153,9 @@ public class ApiRequestService {
 //            );
 
             Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("amount", transaction.getAmount())
-                    .appendQueryParameter("txID", transaction.getTxID())
-                    .appendQueryParameter("domain", transaction.getDomain())
+                    .appendQueryParameter("amount", amount)
+                    .appendQueryParameter("txID", txID)
+                    .appendQueryParameter("domain", merchantId)
                     .appendQueryParameter("skey", sKey)
                     .appendQueryParameter("url", "")
                     .appendQueryParameter("type", "0");
