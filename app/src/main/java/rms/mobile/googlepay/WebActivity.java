@@ -29,11 +29,7 @@ import rms.mobile.googlepay.model.Transaction;
 public class WebActivity extends AppCompatActivity {
 
     private WebView wvGateway;
-    private CountDownTimer countDownTimer;
-    public String isSandbox = "false";
-
     public Transaction transaction = new Transaction();
-    private String _transaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +45,7 @@ public class WebActivity extends AppCompatActivity {
         JSONObject paymentInputObj = null;
         try {
             paymentInputObj = new JSONObject(paymentInput);
-//            transaction.setTxID(paymentInputObj.getString("orderId"));
-//            transaction.setDomain(paymentInputObj.getString("merchantId"));
             transaction.setVkey(paymentInputObj.getString("verificationKey"));
-//            transaction.setAmount(paymentInputObj.getString("amount"));
-
-            paymentInputObj.getString("isSandbox");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -70,12 +61,14 @@ public class WebActivity extends AppCompatActivity {
 
 
         PaymentThread paymentThread = new PaymentThread();
-        paymentThread.runThread(paymentInput, paymentInfo); // set value
+        paymentThread.setValue(paymentInput, paymentInfo); // set value
         Thread thread = new Thread(paymentThread);
         thread.start();
         try {
             thread.join();
-        } catch (InterruptedException e) {
+            JSONObject paymentResult = new JSONObject(new JSONObject(paymentThread.getValue()).getString("responseBody"));
+            onRequestData(paymentResult);
+        } catch (InterruptedException | JSONException e) {
             e.printStackTrace();
         }
 
@@ -84,30 +77,72 @@ public class WebActivity extends AppCompatActivity {
     }
 
     private void onStartTimOut() {
-        long minTimeOut = 3;
-        long interval = 5000;
-        final String[] result = {null};
-        countDownTimer = new CountDownTimer(minTimeOut, interval) {
+        long minTimeOut = 180000; // 3 minutes
+        long interval = 6000;
+        final String[] queryResultStr = {null};
+        Log.d(TAG, String.format("onStartTimOut"));
+        final String[] trasactionJsonStr = {null};
 
+        // Query Transaction ID for every 6 second in 3 minutes
+        CountDownTimer countDownTimer = new CountDownTimer(minTimeOut, interval) {
+
+            // Query Transaction ID for every 6 second in 3 minutes
+            @Override
             public void onTick(long millisUntilFinished) {
                 Log.d(TAG, String.format("onTick: %d", millisUntilFinished / interval));
+
+                JSONObject transactionObject = new JSONObject();
+                try {
+                    transactionObject.put("txID", transaction.getTxID());
+                    transactionObject.put("amount", transaction.getAmount());
+                    transactionObject.put("merchantId", transaction.getDomain());
+                    transactionObject.put("verificationKey", transaction.getVkey());
+                    trasactionJsonStr[0] = transactionObject.toString();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 QueryResultThread queryResultThread = new QueryResultThread();
-                queryResultThread.runThread(_transaction); // set value
+                queryResultThread.setValue(trasactionJsonStr[0]); // set value
                 Thread thread = new Thread(queryResultThread);
                 thread.start();
                 try {
                     thread.join();
-                    result[0] = queryResultThread.getValue();
+                    queryResultStr[0] = queryResultThread.getValue();
+
+                    Log.d(TAG, String.format("onTick QueryResultThread thread.join()"));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
+            @Override
             public void onFinish() {
                 Log.d(TAG, "onFinish");
-//                mMobileSDKResult.onResult(AppData.getInstance().getTxnResult());
-                Toast.makeText(getApplicationContext(), result[0],Toast.LENGTH_LONG).show();
-                finish();
+                try {
+                    JSONObject queryResultJsonObj = new JSONObject(queryResultStr[0]);
+
+                    String responseStr = queryResultJsonObj.getString("responseBody");
+                    String[] parts = responseStr.split(":");
+                    String key = parts[0].trim();
+                    String value = parts[1].trim();
+                    JSONObject responseBodyObj = new JSONObject();
+                    responseBodyObj.put(key, value);
+
+                    Intent intent = new Intent();
+                    intent.putExtra("response", String.valueOf(responseBodyObj));
+
+                    if (responseStr.contains("Error")) {
+                        // do something
+                        setResult(RESULT_CANCELED, intent);
+                    } else {
+                        setResult(RESULT_OK, intent);
+                    }
+                    finish();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         };
         countDownTimer.start();
@@ -124,21 +159,14 @@ public class WebActivity extends AppCompatActivity {
     public void onRequestData(JSONObject response) {
         Log.d(TAG, "onGetPaymentRequestForm onComplete invoked");
 
-        // DELETE LATER
-        if (isSandbox == "true") { // TEST_ENVIRONMENT
-            //RESULT FOR SANDBOX ENVIRONMENT
-            try {
-                response = new JSONObject("{\"MerchantID\":\"rmsxdk_mobile_Dev\",\"ReferenceNo\":\"dcbd3599c6981557197125028a46555\",\"TxnID\":\"87430775\",\"TxnType\":\"SALS\",\"TxnCurrency\":\"MYR\",\"TxnAmount\":\"1.00\",\"TxnChannel\":\"null\",\"TxnData\":{\"RequestURL\":\"https://www.onlinepayment.com.my/RMS/CardScheme/loading.php\",\"RequestMethod\":\"POST\",\"RequestType\":\"REDIRECT\",\"RequestData\":{\"q\":\"4490AE695DCF419BC66F52392A902580740255FCA5550F4083F84AE4FB1212765D182EDBC4F49800867419BDA082C56767F7CE5AD42B7243CC0EB2D531CC98D9468E49B723F065B8EE88915FA6E94191CE608F8D1588C90E7DDE2A640B8A63C181826618BACF05714CFAFE3A67ADBF3D735559275E86EC8BDCF27BB6F0CF4BA38634FCA47118DA927D66FA4518A3C41E6913444C26EDF776F3B500D8DEFA7D3DF8D2149E4A58E6FDCE5469FE02814E04D3CE46C23DC0D210026F1728F530D1CB0B7DADE9A5A23F7D802ECEDE5BE39A0AD2C2C985AC0CEC4A54544E03C72FF0AA23BA7D3A4426AB19241B37C2935AFF5E83AF074A311F573FF40A49D32B7458E7\"}}}");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
         try {
             if (response.has("error_code") && response.has("error_desc")) {
 //                mMobileSDKResult.onResult(String.format("{ code:%s, message:%s }", response.getString("error_code"), response.getString("error_desc")));
+                Intent intent = new Intent();
+                String strResponse = response.toString();
+                intent.putExtra("response", strResponse);
+                setResult(RESULT_CANCELED, intent);
                 finish();
-                return;
             }
             if (response.has("TxnID")) {
 //                AppData.getInstance().setTxnID(response.getString("TxnID"));
@@ -197,16 +225,23 @@ public class WebActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             onLoadHtmlWebView(html.toString());
                         }
                     });
                 } else {
-                    Log.d(TAG, "parameter_not_found : ");
+                    Log.d(TAG, "pInstruction found : ");
+                    Intent intent = new Intent();
+                    String strResponse = response.toString();
+                    intent.putExtra("response", strResponse);
+                    setResult(RESULT_CANCELED, intent);
                     finish();
                 }
             } else {
-                Log.d(TAG, "parameter_not_found : ");
+                Log.d(TAG, "TxID not found ! : ");
+                Intent intent = new Intent();
+                String strResponse = response.toString();
+                intent.putExtra("response", strResponse);
+                setResult(RESULT_CANCELED, intent);
                 finish();
             }
         } catch (JSONException e) {
@@ -220,8 +255,7 @@ public class WebActivity extends AppCompatActivity {
         onRequestData(responseBodyObj);
     }
 
-
-    public class PaymentThread implements Runnable {
+    public static class PaymentThread implements Runnable {
         private volatile String resp;
         private String paymentInput;
         private String  paymentInfo;
@@ -230,44 +264,34 @@ public class WebActivity extends AppCompatActivity {
             return resp;
         }
 
-        public void runThread(String paymentInput, String  paymentInfo) {
+        public void setValue(String paymentInput, String  paymentInfo) {
             this.paymentInput = paymentInput;
             this.paymentInfo = paymentInfo;
-            run();
         }
 
         @Override
         public void run() {
             RMSGooglePay pay = new RMSGooglePay();
+            JSONObject result = null;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                JSONObject result = (JSONObject) pay.requestPayment(paymentInput, paymentInfo);
-                resp = result.toString();
+                result = (JSONObject) pay.requestPayment(paymentInput, paymentInfo);
             }
-
-            // Redirection
-            JSONObject responseBodyObj = null;
-            try {
-                responseBodyObj = new JSONObject(new JSONObject(resp).getString("responseBody"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            onRequestData(responseBodyObj);
-
+            resp = result.toString();
+            Log.d(TAG, String.format("PaymentThread response: %s", resp));
         }
     }
+
 
     public static class QueryResultThread implements Runnable {
         private volatile String resp;
         private String transaction;
 
-
         public String getValue() {
             return resp;
         }
 
-        public void runThread(String transaction) {
+        public void setValue(String transaction) {
             this.transaction = transaction;
-            run();
         }
 
         @Override
@@ -276,10 +300,7 @@ public class WebActivity extends AppCompatActivity {
             JSONObject result = (JSONObject) pay.queryPaymentResult(transaction);
             resp = result.toString();
         }
-
-
     }
-
 
 
     //DEPRECATED
