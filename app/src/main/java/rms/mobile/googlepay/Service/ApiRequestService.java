@@ -152,9 +152,18 @@ public class ApiRequestService {
 //                    mMobileSDKParam.getAmount()
 //            );
 
+//            Uri.Builder builder = new Uri.Builder()
+//                    .appendQueryParameter("amount", amount)
+//                    .appendQueryParameter("txID", txID)
+//                    .appendQueryParameter("domain", merchantId)
+//                    .appendQueryParameter("skey", sKey)
+//                    .appendQueryParameter("url", "")
+//                    .appendQueryParameter("type", "0");
+
+
+
             Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("amount", amount)
-                    .appendQueryParameter("txID", txID)
+                    .appendQueryParameter("tIDs", txID)
                     .appendQueryParameter("domain", merchantId)
                     .appendQueryParameter("skey", sKey)
                     .appendQueryParameter("url", "")
