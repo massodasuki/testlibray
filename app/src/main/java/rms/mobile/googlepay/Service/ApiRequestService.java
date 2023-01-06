@@ -124,9 +124,9 @@ public class ApiRequestService {
             String isSandbox = "false";
 
             if (isSandbox.equals("false")) {
-                endPoint = Production.BASE_PAYMENT + "RMS/q_by_tid.php";
+                endPoint = Production.API_PAYMENT + "RMS/query/q_by_tids.php";
             } else if (isSandbox.equals("true")) {
-                endPoint = Development.BASE_PAYMENT + "RMS/q_by_tid.php";
+                endPoint = Development.API_PAYMENT + "RMS/query/q_by_tids.php";
             }
 
             Uri uri = Uri.parse(endPoint)
