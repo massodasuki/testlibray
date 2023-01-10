@@ -123,10 +123,16 @@ public class ApiRequestService {
             String endPoint = "";
             String isSandbox = "false";
 
+//            if (isSandbox.equals("false")) {
+//                endPoint = Production.API_PAYMENT + "RMS/query/q_by_tids.php";
+//            } else if (isSandbox.equals("true")) {
+//                endPoint = Development.API_PAYMENT + "RMS/query/q_by_tids.php";
+//            }
+
             if (isSandbox.equals("false")) {
-                endPoint = Production.API_PAYMENT + "RMS/query/q_by_tid.php";
+                endPoint = Production.API_PAYMENT + "RMS/q_by_tid.php";
             } else if (isSandbox.equals("true")) {
-                endPoint = Development.API_PAYMENT + "RMS/query/q_by_tid.php";
+                endPoint = Development.API_PAYMENT + "RMS/q_by_tid.php";
             }
 
             Uri uri = Uri.parse(endPoint)
