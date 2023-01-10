@@ -111,6 +111,15 @@ public class WebActivity extends AppCompatActivity {
                     queryResultStr[0] = queryResultThread.getValue();
 
                     Log.d(TAG, String.format("onTick QueryResultThread thread.join()"));
+
+                    // If success
+                    if (!queryResultStr[0].contains("Error")) {
+                        // do something
+                        Intent intent = new Intent();
+                        intent.putExtra("response", String.valueOf(queryResultStr[0]));
+                        setResult(RESULT_OK, intent);
+                    }
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -380,9 +389,4 @@ public class WebActivity extends AppCompatActivity {
             Log.e("PaymentTaskRunner onProgressUpdate", "progressUpdate");
         }
     }
-
-
-
-
-
 }

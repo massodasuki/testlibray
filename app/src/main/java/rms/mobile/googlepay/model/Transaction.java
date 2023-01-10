@@ -1,8 +1,6 @@
 package rms.mobile.googlepay.model;
 
 import java.io.Serializable;
-
-
 public class Transaction implements Serializable {
 
     String amount;
@@ -72,6 +70,5 @@ public class Transaction implements Serializable {
     public void setType(String type) {
         this.type = type;
     }
-
 
 }
