@@ -232,7 +232,7 @@ public class ApiRequestService {
             response.put("statusCode", httpURLConnection.getResponseCode());
             response.put("responseMessage", httpURLConnection.getResponseMessage());
             response.put("responseBody", getResponseBody(httpURLConnection));
-            response.put("responseBodyJSON", getJSONResponseBody(httpURLConnection));
+//            response.put("responseBodyJSON", getJSONResponseBody(httpURLConnection));
             Log.d(TAG, String.format("code: %s - %s body - %s", response.getString("statusCode"),response.getString("responseMessage"), response.getString("responseBody")));
             return response;
         } catch (Exception e) {
@@ -243,18 +243,36 @@ public class ApiRequestService {
     }
 
     public static String getResponseBody(HttpURLConnection conn) {
+//        BufferedReader br = null;
+//        StringBuilder body = null;
+//        String line = "";
+//
+//        try {
+//            br = new BufferedReader(new InputStreamReader(
+//                    conn.getInputStream()));
+//            body = new StringBuilder();
+//
+//            while ((line = br.readLine()) != null)
+//                body.append(line);
+//            return body.toString();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
 
 
-        BufferedReader br = null;
-        StringBuilder body = null;
-        String line = "";
+        BufferedReader bufferedReader = null;
+        Map<String, String> holder = new HashMap<>();
+        JSONObject mainObject;
+        String output;
+
         try {
-            br = new BufferedReader(new InputStreamReader(
-                    conn.getInputStream()));
-            body = new StringBuilder();
-            while ((line = br.readLine()) != null)
-                body.append(line);
-            return body.toString();
+            while ((output = bufferedReader.readLine()) != null) {
+                String[] keyValuePair = output.split(":");
+                holder.putIfAbsent(keyValuePair[0].trim(), keyValuePair[1].trim());
+            }
+            mainObject = new JSONObject(holder);
+            Log.d(TAG, String.format("response: %s", mainObject));
+            return mainObject.toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
