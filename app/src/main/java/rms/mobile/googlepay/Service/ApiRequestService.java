@@ -6,19 +6,15 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -121,69 +117,6 @@ public class ApiRequestService {
         return null;
     }
 
-    public Object GetPaymentResult(JSONObject transaction ) {
-        Log.d(TAG, "GetPaymentRequest invoked");
-        try {
-            String endPoint = "";
-            String isSandbox = "false";
-
-//            if (isSandbox.equals("false")) {
-//                endPoint = Production.API_PAYMENT + "RMS/query/q_by_tids.php";
-//            } else if (isSandbox.equals("true")) {
-//                endPoint = Development.API_PAYMENT + "RMS/query/q_by_tids.php";
-//            }
-
-            if (isSandbox.equals("false")) {
-                endPoint = Production.API_PAYMENT + "RMS/q_by_tid.php";
-            } else if (isSandbox.equals("true")) {
-                endPoint = Development.API_PAYMENT + "RMS/q_by_tid.php";
-            }
-
-            Uri uri = Uri.parse(endPoint)
-                    .buildUpon()
-                    .build();
-
-            String txID = transaction.getString("txID");
-            String amount = transaction.getString("amount");
-            String merchantId = transaction.getString("merchantId");
-            String verificationKey = transaction.getString("verificationKey");
-
-            String sKey = ApplicationHelper.getInstance().GetSKey(
-                    txID,
-                    merchantId,
-                    verificationKey,
-                    amount
-            );
-
-//            String sKey = ApplicationHelper.getInstance().GetSKey(
-//                    AppData.getInstance().getTxnID(),
-//                    mMobileSDKParam.getMerchantId(),
-//                    mMobileSDKParam.getVerificationKey(),
-//                    mMobileSDKParam.getAmount()
-//            );
-
-            Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("amount", amount)
-                    .appendQueryParameter("txID", txID)
-                    .appendQueryParameter("domain", merchantId)
-                    .appendQueryParameter("skey", sKey)
-                    .appendQueryParameter("url", "")
-                    .appendQueryParameter("type", "0");
-
-//            Uri.Builder builder = new Uri.Builder()
-//                    .appendQueryParameter("tIDs", txID)
-//                    .appendQueryParameter("domain", merchantId)
-//                    .appendQueryParameter("skey", sKey)
-//                    .appendQueryParameter("url", "")
-//                    .appendQueryParameter("type", "0");
-
-            return postRequest(uri, builder);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
     private JSONObject postRequest(final Uri uri, final Uri.Builder params) throws JSONException {
         HttpURLConnection httpConnection = null;
@@ -243,23 +176,142 @@ public class ApiRequestService {
     }
 
     public static String getResponseBody(HttpURLConnection conn) {
-//        BufferedReader br = null;
-//        StringBuilder body = null;
-//        String line = "";
-//
-//        try {
-//            br = new BufferedReader(new InputStreamReader(
-//                    conn.getInputStream()));
-//            body = new StringBuilder();
-//
-//            while ((line = br.readLine()) != null)
-//                body.append(line);
-//            return body.toString();
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
+        BufferedReader br = null;
+        StringBuilder body = null;
+        String line = "";
+
+        try {
+            br = new BufferedReader(new InputStreamReader(
+                    conn.getInputStream()));
+            body = new StringBuilder();
+
+            while ((line = br.readLine()) != null)
+                body.append(line);
+            return body.toString();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Object GetPaymentResult(JSONObject transaction ) {
+        Log.d(TAG, "GetPaymentRequest invoked");
+        try {
+            String endPoint = "";
+            String isSandbox = "false";
+
+//            if (isSandbox.equals("false")) {
+//                endPoint = Production.API_PAYMENT + "RMS/query/q_by_tids.php";
+//            } else if (isSandbox.equals("true")) {
+//                endPoint = Development.API_PAYMENT + "RMS/query/q_by_tids.php";
+//            }
+
+            if (isSandbox.equals("false")) {
+                endPoint = Production.API_PAYMENT + "RMS/q_by_tid.php";
+            } else if (isSandbox.equals("true")) {
+                endPoint = Development.API_PAYMENT + "RMS/q_by_tid.php";
+            }
+
+            Uri uri = Uri.parse(endPoint)
+                    .buildUpon()
+                    .build();
+
+            String txID = transaction.getString("txID");
+            String amount = transaction.getString("amount");
+            String merchantId = transaction.getString("merchantId");
+            String verificationKey = transaction.getString("verificationKey");
+
+            String sKey = ApplicationHelper.getInstance().GetSKey(
+                    txID,
+                    merchantId,
+                    verificationKey,
+                    amount
+            );
+
+//            String sKey = ApplicationHelper.getInstance().GetSKey(
+//                    AppData.getInstance().getTxnID(),
+//                    mMobileSDKParam.getMerchantId(),
+//                    mMobileSDKParam.getVerificationKey(),
+//                    mMobileSDKParam.getAmount()
+//            );
+
+            Uri.Builder builder = new Uri.Builder()
+                    .appendQueryParameter("amount", amount)
+                    .appendQueryParameter("txID", txID)
+                    .appendQueryParameter("domain", merchantId)
+                    .appendQueryParameter("skey", sKey)
+                    .appendQueryParameter("url", "")
+                    .appendQueryParameter("type", "0");
+
+//            Uri.Builder builder = new Uri.Builder()
+//                    .appendQueryParameter("tIDs", txID)
+//                    .appendQueryParameter("domain", merchantId)
+//                    .appendQueryParameter("skey", sKey)
+//                    .appendQueryParameter("url", "")
+//                    .appendQueryParameter("type", "0");
+
+            return postQRequest(uri, builder);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 
+    private JSONObject postQRequest(final Uri uri, final Uri.Builder params) throws JSONException {
+        HttpURLConnection httpConnection = null;
+        try {
+            Log.d(TAG, "postRequest invoked");
+
+            Log.d(TAG, String.format("endpoint: %s", uri));
+            URL url = new URL(uri.toString());
+            httpConnection = (HttpURLConnection) url.openConnection();
+            httpConnection.setRequestMethod("POST");
+            httpConnection.setRequestProperty("Accept", "application/json");
+            httpConnection.setRequestProperty("Cookies", "PHPSESSID=ad6081qpihsb9en1nr9nivbkl3");
+            httpConnection.setRequestProperty("SDK-Version", "4.0.0");
+            httpConnection.setDoOutput(true);
+            httpConnection.setDoInput(true);
+
+            String query = params.build().getEncodedQuery();
+            Log.d(TAG, String.format("parameter: %s", query));
+            OutputStream outputStream = httpConnection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+            writer.write(query);
+            writer.flush();
+            writer.close();
+            outputStream.close();
+
+            return parseQ(httpConnection);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
+        } finally {
+            if (httpConnection != null) {
+                httpConnection.disconnect();
+            }
+        }
+    }
+
+    private JSONObject parseQ(HttpURLConnection httpURLConnection) throws JSONException {
+        StringBuilder stringBuilder = new StringBuilder();
+        JSONObject response = new JSONObject();
+
+        try {
+//            Log.d(TAG, String.format("code: %s - %s", httpURLConnection.getResponseCode(), httpURLConnection.getResponseMessage()));
+            response.put("statusCode", httpURLConnection.getResponseCode());
+            response.put("responseMessage", httpURLConnection.getResponseMessage());
+            response.put("responseBody", getJSONResponseBody(httpURLConnection));
+            Log.d(TAG, String.format("code: %s - %s body - %s", response.getString("statusCode"),response.getString("responseMessage"), response.getString("responseBody")));
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(TAG, String.format("response: %s", stringBuilder));
+            return new JSONObject(String.format("{\"exception\":\"%s\"}", e.getMessage()));
+        }
+    }
+
+
+    public String getJSONResponseBody(HttpURLConnection conn) {
         BufferedReader bufferedReader = null;
         Map<String, String> holder = new HashMap<>();
         JSONObject mainObject;
@@ -276,41 +328,6 @@ public class ApiRequestService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public JSONArray getJSONResponseBody(HttpURLConnection conn) {
-        JSONArray jsonArray = null;
-
-        String jsonString = null;
-        try {
-            BufferedReader bufferedReader = null;
-            try {
-                bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            StringBuilder stringBuilder = new StringBuilder();
-
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line + '\n');
-            }
-            jsonString = stringBuilder.toString();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            jsonArray = new JSONArray(jsonString);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return jsonArray;
     }
 
 
