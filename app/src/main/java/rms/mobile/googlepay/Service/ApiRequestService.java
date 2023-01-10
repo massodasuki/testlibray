@@ -166,10 +166,8 @@ public class ApiRequestService {
 //                    .appendQueryParameter("url", "")
 //                    .appendQueryParameter("type", "0");
 
-
-
             Uri.Builder builder = new Uri.Builder()
-                    .appendQueryParameter("tIDs", txID)
+                    .appendQueryParameter("txID", txID)
                     .appendQueryParameter("domain", merchantId)
                     .appendQueryParameter("skey", sKey)
                     .appendQueryParameter("url", "")
