@@ -6,15 +6,19 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -228,6 +232,7 @@ public class ApiRequestService {
             response.put("statusCode", httpURLConnection.getResponseCode());
             response.put("responseMessage", httpURLConnection.getResponseMessage());
             response.put("responseBody", getResponseBody(httpURLConnection));
+            response.put("responseBodyJSON", getJSONResponseBody(httpURLConnection));
             Log.d(TAG, String.format("code: %s - %s body - %s", response.getString("statusCode"),response.getString("responseMessage"), response.getString("responseBody")));
             return response;
         } catch (Exception e) {
@@ -238,6 +243,8 @@ public class ApiRequestService {
     }
 
     public static String getResponseBody(HttpURLConnection conn) {
+
+
         BufferedReader br = null;
         StringBuilder body = null;
         String line = "";
@@ -252,4 +259,41 @@ public class ApiRequestService {
             throw new RuntimeException(e);
         }
     }
+
+    public JSONArray getJSONResponseBody(HttpURLConnection conn) {
+        JSONArray jsonArray = null;
+
+        String jsonString = null;
+        try {
+            BufferedReader bufferedReader = null;
+            try {
+                bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line + '\n');
+            }
+            jsonString = stringBuilder.toString();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (ProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            jsonArray = new JSONArray(jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return jsonArray;
+    }
+
+
 }
