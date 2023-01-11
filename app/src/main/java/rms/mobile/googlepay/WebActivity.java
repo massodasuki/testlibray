@@ -140,7 +140,7 @@ public class WebActivity extends AppCompatActivity {
                     String responseBody = queryResultObj.getString("responseBody");
                     JSONObject responseBodyObj = new JSONObject(responseBody);
                     Intent intent = new Intent();
-                    intent.putExtra("response", String.valueOf(queryResultStr[0]));
+                    intent.putExtra("response", String.valueOf(responseBodyObj));
                     // If Fail
                     if (!responseBodyObj.has("StatCode")){
                         setResult(RESULT_CANCELED, intent);
