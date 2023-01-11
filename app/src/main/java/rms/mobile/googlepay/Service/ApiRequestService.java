@@ -318,6 +318,7 @@ public class ApiRequestService {
         String output;
 
         try {
+            bufferedReader = new BufferedReader(new InputStreamReader((conn.getInputStream())));
             while ((output = bufferedReader.readLine()) != null) {
                 String[] keyValuePair = output.split(":");
                 holder.putIfAbsent(keyValuePair[0].trim(), keyValuePair[1].trim());
