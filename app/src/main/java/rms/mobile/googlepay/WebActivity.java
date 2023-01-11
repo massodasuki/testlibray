@@ -110,14 +110,21 @@ public class WebActivity extends AppCompatActivity {
                     thread.join();
                     queryResultStr[0] = queryResultThread.getValue();
 
-                    Log.d(TAG, String.format("onTick QueryResultThread thread.join()"));
+                    try {
+                        JSONObject queryResultObj = new JSONObject(queryResultStr[0]);
+                        String responseBody = queryResultObj.getString("responseBody");
+                        JSONObject responseBodyObj = new JSONObject(responseBody);
 
-                    // If success
-                    if (!queryResultStr[0].contains("Error")) {
-                        // do something
-                        Intent intent = new Intent();
-                        intent.putExtra("response", String.valueOf(queryResultStr[0]));
-                        setResult(RESULT_OK, intent);
+                        // If StatCode
+                        if (responseBodyObj.has("StatCode")){
+                            Intent intent = new Intent();
+                            intent.putExtra("response", String.valueOf(queryResultStr[0]));
+                            setResult(RESULT_OK, intent);
+                            finish();
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
                 } catch (InterruptedException e) {
@@ -129,20 +136,13 @@ public class WebActivity extends AppCompatActivity {
             public void onFinish() {
                 Log.d(TAG, "onFinish");
                 try {
-                    JSONObject queryResultJsonObj = new JSONObject(queryResultStr[0]);
-
-                    String responseStr = queryResultJsonObj.getString("responseBody");
-                    String[] parts = responseStr.split(":");
-                    String key = parts[0].trim();
-                    String value = parts[1].trim();
-                    JSONObject responseBodyObj = new JSONObject();
-                    responseBodyObj.put(key, value);
-
+                    JSONObject queryResultObj = new JSONObject(queryResultStr[0]);
+                    String responseBody = queryResultObj.getString("responseBody");
+                    JSONObject responseBodyObj = new JSONObject(responseBody);
                     Intent intent = new Intent();
-                    intent.putExtra("response", String.valueOf(responseBodyObj));
-
-                    if (responseStr.contains("Error")) {
-                        // do something
+                    intent.putExtra("response", String.valueOf(queryResultStr[0]));
+                    // If Fail
+                    if (!responseBodyObj.has("StatCode")){
                         setResult(RESULT_CANCELED, intent);
                     } else {
                         setResult(RESULT_OK, intent);
