@@ -30,6 +30,7 @@ public class WebActivity extends AppCompatActivity {
 
     private WebView wvGateway;
     public Transaction transaction = new Transaction();
+    private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,9 +83,7 @@ public class WebActivity extends AppCompatActivity {
         final String[] queryResultStr = {null};
         Log.d(TAG, String.format("onStartTimOut"));
         final String[] trasactionJsonStr = {null};
-
-        // Query Transaction ID for every 6 second in 3 minutes
-        CountDownTimer countDownTimer = new CountDownTimer(minTimeOut, interval) {
+        countDownTimer = new CountDownTimer(minTimeOut, interval) {
 
             // Query Transaction ID for every 6 second in 3 minutes
             @Override
@@ -115,10 +114,13 @@ public class WebActivity extends AppCompatActivity {
                         String responseBody = queryResultObj.getString("responseBody");
                         JSONObject responseBodyObj = new JSONObject(responseBody);
 
+                        Log.d(TAG, String.format("checkResponseBodyObj"));
+                        Log.d(TAG, String.valueOf(responseBodyObj));
                         // If StatCode
                         if (responseBodyObj.has("StatCode")){
                             String statCodeValue = responseBodyObj.getString("StatCode");
-                            if (statCodeValue != "22" ) {
+
+                            if (!statCodeValue.equals("22")) {
                                 //If not pending
                                 Intent intent = new Intent();
 //                                intent.putExtra("response", String.valueOf(queryResultStr[0]));
@@ -131,7 +133,6 @@ public class WebActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -140,6 +141,7 @@ public class WebActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 Log.d(TAG, "onFinish");
+
                 try {
                     JSONObject queryResultObj = new JSONObject(queryResultStr[0]);
                     String responseBody = queryResultObj.getString("responseBody");
@@ -157,6 +159,7 @@ public class WebActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
             }
         };
         countDownTimer.start();
